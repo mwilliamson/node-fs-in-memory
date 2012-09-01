@@ -1,6 +1,6 @@
 {
     "name": "fs-in-memory",
-    "version": "0.1.0",
+    "version": "0.1.1",
     "dependencies": {
         "mkdirp": "0.3.x",
         "q": "0.8.8",
