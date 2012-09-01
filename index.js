@@ -58,12 +58,14 @@ function createPromised(files) {
         return q.resolve(parts);
     }
     
-    function readFile(filePath) {
+    function readFile(filePath, encoding) {
         return navigateTo(filePath).then(function(file) {
-            if (isFile(file)) {
-                return q.resolve(file);
+            if (!isFile(file)) {
+                return q.reject(new Error(filePath + " is not a file"));
+            } else if (encoding.toLowerCase() !== "utf8") {
+                return q.reject(new Error("Cannot read file in encodings other than utf8"));
             } else {
-                return q.reject(filePath + " is not a file");
+                return q.resolve(file);
             }
         });
     }
@@ -169,8 +171,7 @@ function _convertPromisedMethod(obj, methodName, successCallback, failureCallbac
         obj[methodName].apply(obj, args)
             .then(function(value) {
                 successCallback(value, callback);
-            })
-            .fail(function(err) {
+            }, function(err) {
                 failureCallback(err, callback);
             });
     };

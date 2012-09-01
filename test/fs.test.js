@@ -7,6 +7,17 @@ exports["can write file and then read it out"] = function(test) {
     });
 };
 
+exports["cannot read file with encoding other than utf8"] = function(test) {
+    var fs = fsInMemory.create();
+    fs.writeFile("/blah", "Right here waiting for you", function(err) {
+        test.ifError(err);
+        fs.readFile("/blah", "iso-8859-1", function(err, contents) {
+            test.equal(err.message, "Cannot read file in encodings other than utf8");
+            test.done();
+        });
+    });
+};
+
 exports["exists is false if file doesn't exist"] = function(test) {
     var fs = fsInMemory.create();
     
