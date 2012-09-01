@@ -1,4 +1,5 @@
 exports.create = create;
+exports.createPromised = createPromised;
 
 var path = require("path");
 
