@@ -11,7 +11,8 @@ function create(files) {
     return {
         readFile: convertPromisedMethod(fs, "readFile"),
         exists: convertBooleanPromisedMethod(fs, "exists"),
-        writeFile: convertPromisedMethod(fs, "writeFile")
+        writeFile: convertPromisedMethod(fs, "writeFile"),
+        mkdir: convertPromisedMethod(fs, "mkdir")
     };
 }
 
@@ -95,6 +96,20 @@ function createPromised(files) {
         });
     }
     
+    function mkdir(filePath) {
+        var filename = path.basename(filePath);
+        return navigateTo(path.dirname(filePath)).then(function(parent) {
+            return exists(filePath).then(function(exists) {
+                if (exists) {
+                    return q.reject(new Error(filePath + " already exists"));
+                } else {
+                    parent[filename] = {};
+                    return q.resolve();
+                }
+            });
+        });
+    }
+    
     function writeFile(filePath, contents) {
         var filename = path.basename(filePath);
         return navigateTo(path.dirname(filePath)).then(function(parent) {
@@ -112,6 +127,7 @@ function createPromised(files) {
         readdir: readdir,
         exists: exists,
         mkdirp: mkdirp,
+        mkdir: mkdir,
         writeFile: writeFile
     };
 }
