@@ -13,7 +13,8 @@ function create(files) {
         exists: convertBooleanPromisedMethod(fs, "exists"),
         writeFile: convertPromisedMethod(fs, "writeFile"),
         mkdir: convertPromisedMethod(fs, "mkdir"),
-        appendFile: convertPromisedMethod(fs, "appendFile")
+        appendFile: convertPromisedMethod(fs, "appendFile"),
+        readdir: convertPromisedMethod(fs, "readdir")
     };
 }
 

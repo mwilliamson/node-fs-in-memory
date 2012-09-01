@@ -89,6 +89,30 @@ exports["appendFile appends to existing files"] = function(test) {
     });
 };
 
+exports["readdir returns empty list if there are no files"] = function(test) {
+    var fs = fsInMemory.create();
+    fs.readdir("/", function(err, files) {
+        test.ifError(err);
+        test.deepEqual([], files);
+        test.done();
+    });
+};
+
+exports["readdir provides listing of files in directory"] = function(test) {
+    var fs = fsInMemory.create();
+    fs.writeFile("/one", "One", function(err) {
+        test.ifError(err);
+        fs.writeFile("/two", "Two", function(err) {
+            test.ifError(err);
+            fs.readdir("/", function(err, files) {
+                test.ifError(err);
+                test.deepEqual(["one", "two"], files);
+                test.done();
+            });
+        });
+    });
+};
+
 function assertWriteAndReadFile(test, fs, filePath, callback) {
     fs.writeFile(filePath, "Right here waiting for you", function(err) {
         test.ifError(err);
