@@ -12,7 +12,8 @@ function create(files) {
         readFile: convertPromisedMethod(fs, "readFile"),
         exists: convertBooleanPromisedMethod(fs, "exists"),
         writeFile: convertPromisedMethod(fs, "writeFile"),
-        mkdir: convertPromisedMethod(fs, "mkdir")
+        mkdir: convertPromisedMethod(fs, "mkdir"),
+        appendFile: convertPromisedMethod(fs, "appendFile")
     };
 }
 
@@ -126,13 +127,32 @@ function createPromised(files) {
         });
     }
     
+    function appendFile(filePath, contents) {
+        return exists(filePath).then(function(exists) {
+            if (exists) {
+                return navigateTo(path.dirname(filePath)).then(function(parent) {
+                    var filename = path.basename(filePath);
+                    if (isFile(parent[filename])) {
+                        parent[filename] += contents;
+                        return q.resolve();
+                    } else {
+                        return q.reject(new Error("Cannot append to non-file"));
+                    }
+                });
+            } else {
+                return writeFile(filePath, contents);
+            }
+        });
+    }
+    
     return {
         readFile: readFile,
         readdir: readdir,
         exists: exists,
         mkdirp: mkdirp,
         mkdir: mkdir,
-        writeFile: writeFile
+        writeFile: writeFile,
+        appendFile: appendFile
     };
 }
 

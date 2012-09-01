@@ -62,6 +62,33 @@ exports["can write file into newly created directory"] = function(test) {
     });
 };
 
+exports["appendFile creates file if it doesn't already exist"] = function(test) {
+    var fs = fsInMemory.create();
+    fs.appendFile("/blah", "One", function(err) {
+        test.ifError(err);
+        fs.readFile("/blah", "utf8", function(err, contents) {
+            test.ifError(err);
+            test.equal("One", contents);
+            test.done();
+        });
+    });
+};
+
+exports["appendFile appends to existing files"] = function(test) {
+    var fs = fsInMemory.create();
+    fs.writeFile("/blah", "One", function(err) {
+        test.ifError(err);
+        fs.appendFile("/blah", "Two", function(err) {
+            test.ifError(err);
+            fs.readFile("/blah", "utf8", function(err, contents) {
+                test.ifError(err);
+                test.equal("OneTwo", contents);
+                test.done();
+            });
+        });
+    });
+};
+
 function assertWriteAndReadFile(test, fs, filePath, callback) {
     fs.writeFile(filePath, "Right here waiting for you", function(err) {
         test.ifError(err);
