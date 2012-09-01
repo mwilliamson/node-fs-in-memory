@@ -62,6 +62,8 @@ function createPromised(files) {
         return navigateTo(filePath).then(function(file) {
             if (!isFile(file)) {
                 return q.reject(new Error(filePath + " is not a file"));
+            } else if (!encoding) {
+                return q.resolve(new Buffer(file));
             } else if (encoding.toLowerCase() !== "utf8") {
                 return q.reject(new Error("Cannot read file in encodings other than utf8"));
             } else {

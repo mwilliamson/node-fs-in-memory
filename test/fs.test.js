@@ -18,6 +18,19 @@ exports["cannot read file with encoding other than utf8"] = function(test) {
     });
 };
 
+exports["can read file as buffer"] = function(test) {
+    var fs = fsInMemory.create();
+    fs.writeFile("/blah", "Right here waiting for you", function(err) {
+        test.ifError(err);
+        fs.readFile("/blah", function(err, contents) {
+            test.ifError(err);
+            test.equal(true, Buffer.isBuffer(contents));
+            test.equal("Right here waiting for you", contents.toString("utf8"));
+            test.done();
+        });
+    });
+};
+
 exports["exists is false if file doesn't exist"] = function(test) {
     var fs = fsInMemory.create();
     
