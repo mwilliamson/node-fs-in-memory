@@ -6,6 +6,16 @@ var q = require("q");
 var _ = require("underscore");
 
 function create(files) {
+    var fs = createPromised(files);
+    
+    return {
+        readFile: convertPromisedMethod(fs, "readFile"),
+        exists: convertBooleanPromisedMethod(fs, "exists"),
+        writeFile: convertPromisedMethod(fs, "writeFile")
+    };
+}
+
+function createPromised(files) {
     files = files || {};
     function navigateTo(filePath) {
         return pathToParts(filePath).then(function(parts) {
@@ -112,3 +122,40 @@ function constant(value) {
     };
 }
 
+function convertPromisedMethod(obj, methodName) {
+    function onSuccess(value, callback) {
+        callback(null, value);
+    }
+    
+    function onFailure(err, callback) {
+        callback(err);
+    }
+    
+    return _convertPromisedMethod(obj, methodName, onSuccess, onFailure);
+}
+
+function convertBooleanPromisedMethod(obj, methodName) {
+    function onSuccess(value, callback) {
+        callback(value);
+    }
+    
+    function onFailure(err, callback) {
+        throw new Error("Boolean methods shouldn't fail");
+    }
+    
+    return _convertPromisedMethod(obj, methodName, onSuccess, onFailure);
+}
+
+function _convertPromisedMethod(obj, methodName, successCallback, failureCallback) {
+    return function() {
+        var args = Array.prototype.slice.call(arguments, 0, arguments.length - 1);
+        var callback = arguments[arguments.length - 1];
+        obj[methodName].apply(obj, args)
+            .then(function(value) {
+                successCallback(value, callback);
+            })
+            .fail(function(err) {
+                failureCallback(err, callback);
+            });
+    };
+}
